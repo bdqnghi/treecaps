@@ -63,7 +63,7 @@ def dynamic_routing(shape, input, num_outputs=10, num_dims=16):
 
     return(v_J)
 
-def vts_routing(primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel, num_conv, output_size):
+def vts_routing(alpha_IJ, primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel, num_conv, output_size):
     """The proposed Variable-to-Static Routing Algorithm."""
     # top_a = 10
     # top_b = 15
@@ -74,7 +74,7 @@ def vts_routing(primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel
     # primary_variable_caps = (12, 48, 128, 8)
 
     # (12, 1920, 1280)
-    alpha_IJ = tf.zeros((int(num_caps_top_a/top_a*top_b), num_caps_top_a), dtype=tf.float32)
+    # alpha_IJ = tf.zeros((int(num_caps_top_a/top_a*top_b), num_caps_top_a), dtype=tf.float32)
     # (12, 128, 8, 48)
     primary_variable_caps_transposed = tf.transpose(primary_variable_caps,perm=[0,2,3,1])
     
@@ -121,7 +121,7 @@ def vts_routing(primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel
 def init_net_treecaps(feature_size, label_size, embedding_lookup):
     """Initialize an empty TreeCaps network."""
     top_a = config.TOP_A
-    top_b = config.TOP_B
+    # top_b = config.TOP_B
     num_conv = config.NUM_CONV
     output_size = config.OUTPUT_SIZE
     num_channel = config.NUM_CHANNEL
@@ -133,9 +133,11 @@ def init_net_treecaps(feature_size, label_size, embedding_lookup):
         # nodes = tf.placeholder(tf.float32, shape=(None, None, feature_size), name='tree')
         nodes = tf.placeholder(tf.int32, shape=(None, None), name='tree')
         children = tf.placeholder(tf.int32, shape=(None, None, None), name='children')
-        # alpha_IJ = tf.placeholder(tf.int32, shape=(None, None, None), name='children')
+        # alpha_IJ = tf.zeros((int(num_caps_top_a/top_a*top_b), num_caps_top_a), dtype=tf.float32)
+        alpha_IJ = tf.placeholder(tf.float32, shape=(None, None), name='alpha_IJ')
         node_embeddings_lookup = tf.Variable(tf.contrib.layers.xavier_initializer()([len(embedding_lookup.keys()), feature_size]), name='node_type_embeddings')
         # nodes_indicator = tf.placeholder(tf.float32, shape=(None, None), name='nodes_indicator')
+       
       
     with tf.name_scope('network'):  
         node_embeddings = compute_parent_node_types_tensor(nodes, node_embeddings_lookup)
@@ -157,11 +159,11 @@ def init_net_treecaps(feature_size, label_size, embedding_lookup):
         # primary_variable_caps = tf.transpose(primary_variable_caps, perm=[0, 1, 3, 2])   
         # primary_variable_caps_scaled = nn_attention_layer(primary_variable_caps, batch_size, mask, "attention", output_size, caps1_num_dims)
 
-        # top_b = tf.shape(node_embeddings)[1]
-        # top_b = tf.cast(top_b, tf.int32)
+        top_b = tf.shape(node_embeddings)[1]
+        top_b = tf.cast(top_b, tf.int32)
         """The Primary Static Capsule Layer."""
         # (12, 1280, 8, 1)
-        primary_static_caps = vts_routing(primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel, num_conv, output_size)
+        primary_static_caps = vts_routing(alpha_IJ, primary_variable_caps, top_a, top_b, num_caps_top_a, num_channel, num_conv, output_size)
         # (12, 1280, 1, 8, 1)
         primary_static_caps = tf.reshape(primary_static_caps, shape=(batch_size, -1, 1, num_channel, 1))
         
@@ -177,7 +179,7 @@ def init_net_treecaps(feature_size, label_size, embedding_lookup):
         v_length = tf.sqrt(reduce_sum(tf.square(codeCaps),axis=2, keepdims=True) + 1e-9)
         out = tf.reshape(v_length,(-1,label_size))
 
-    return nodes, children, out, primary_variable_caps
+    return nodes, children, out, alpha_IJ
 
 def aggregation_layer(conv, output_size, distributed_function):
     # conv is (batch_size, max_tree_size, output_size)

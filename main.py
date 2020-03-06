@@ -19,6 +19,7 @@ import shutil
 import progressbar
 from keras_radam.training import RAdamOptimizer
 from config import BATCH_SIZE
+import config
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_batch_size', type=int, default=5, help='train batch size, always 1')
@@ -55,7 +56,7 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
     
     random.shuffle(train_trees)
     
-    nodes_node, children_node, codecaps_node, primary_variable_caps_node = network.init_net_treecaps(num_feats,len(labels), embedding_lookup)
+    nodes_node, children_node, codecaps_node, alpha_IJ_node = network.init_net_treecaps(num_feats,len(labels), embedding_lookup)
 
     codecaps_node = tf.identity(codecaps_node, name="codecaps_node")
 
@@ -83,6 +84,13 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
 
     checkfile = os.path.join(logdir, 'tree_network.ckpt')
 
+    top_a = config.TOP_A
+   
+    num_conv = config.NUM_CONV
+    output_size = config.OUTPUT_SIZE
+    num_channel = config.NUM_CHANNEL
+    num_caps_top_a = int(num_conv*output_size/num_channel)*top_a
+
     print("Begin training..........")
     num_batches = len(train_trees) // batch_size + (1 if len(train_trees) % batch_size != 0 else 0)
     for epoch in range(1, epochs+1):
@@ -93,18 +101,22 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
         )):
             print("-------------")
             nodes, children, batch_labels = batch
+
+
             step = (epoch - 1) * num_batches + i * batch_size
 
-            # alpha_IJ = np.zeros((batch_size, int(num_outputs/top_a*top_b), num_outputs), dtype=tf.float32)
 
+            alpha_IJ_shape = (int(num_caps_top_a/top_a*nodes.shape[1]), num_caps_top_a)
+            alpha_IJ = np.zeros(alpha_IJ_shape)
             # if not nodes:
             #     continue
-            _, err, out, primary_variable_caps = sess.run(
-                [train_step, loss_node, out_node, primary_variable_caps_node],
+            _, err, out = sess.run(
+                [train_step, loss_node, out_node],
                 feed_dict={
                     nodes_node: nodes,
                     children_node: children,
-                    labels_node: batch_labels
+                    labels_node: batch_labels,
+                    alpha_IJ_node: alpha_IJ
             
                 }
             )
@@ -119,7 +131,7 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
             # print(codecaps_node_data[0].shape)
             # print(conv_output.shape)
             # print(attention_scores.shape)
-            print(primary_variable_caps.shape)
+
             print("Epoch:", epoch, "Step:", step, "Loss:", err)
             # bar.update(i+1)
         # bar.finish()
@@ -131,10 +143,16 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
             sampling.gen_samples(val_trees, labels, embeddings, embedding_lookup), batch_size
         ):
             nodes, children, batch_labels = batch
+
+
+            alpha_IJ_shape = (int(num_caps_top_a/top_a*nodes.shape[1]), num_caps_top_a)
+            alpha_IJ = np.zeros(alpha_IJ_shape)
+
             output = sess.run([out_node],
                 feed_dict={
                     nodes_node: nodes,
-                    children_node: children
+                    children_node: children,
+                    alpha_IJ_node: alpha_IJ
                 }
             )
             correct_labels.extend(np.argmax(batch_labels, axis=1).tolist())
