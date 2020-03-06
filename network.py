@@ -92,13 +92,16 @@ def vts_routing(alpha_IJ, primary_variable_caps, top_a, top_b, num_caps_top_a, n
 
     # Computing u_i----------------------------
     # (12, 128, 8, 15)
-    u_i,_ = tf.nn.top_k(primary_variable_caps_transposed,k=top_b)
+    # u_i,_ = tf.nn.top_k(primary_variable_caps_transposed,k=top_b)
     # (1, 180, 128, 8)
-    u_i = tf.reshape(u_i,shape=(1,-1, output_size, num_conv))
+    # u_i = tf.reshape(u_i,shape=(1,-1, output_size, num_conv))
     # (1, 8, 180, 128)
-    u_i = tf.transpose(u_i,perm=[0,3,1,2])
+    # u_i = tf.transpose(u_i,perm=[0,3,1,2])
     # (12, 1920, 8)
-    u_i = tf.reshape(u_i, (batch_size, -1, num_channel))
+    # u_i = tf.reshape(u_i, (batch_size, -1, num_channel))
+    # u_i = tf.stop_gradient(u_i)
+
+    u_i = tf.reshape(primary_variable_caps, (batch_size, -1, num_channel))
     u_i = tf.stop_gradient(u_i)
 
     
