@@ -95,6 +95,8 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
             nodes, children, batch_labels = batch
             step = (epoch - 1) * num_batches + i * batch_size
 
+            # alpha_IJ = np.zeros((batch_size, int(num_outputs/top_a*top_b), num_outputs), dtype=tf.float32)
+
             # if not nodes:
             #     continue
             _, err, out, primary_variable_caps = sess.run(
