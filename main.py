@@ -69,7 +69,7 @@ def form_model_path(opt):
 
 
 
-def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
+def train_model(train_trees, val_trees, embedding_lookup, opt):
     random.shuffle(train_trees)
     random.shuffle(val_trees)
 
@@ -108,12 +108,9 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
     for epoch in range(1, epochs+1):
         # bar = progressbar.ProgressBar(maxval=len(train_trees), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         # bar.start()
-        for train_step, batch in enumerate(sampling.batch_samples(
-            sampling.gen_samples(train_trees, labels, embedding_lookup), batch_size
-        )):
+        for train_step, batch in enumerate(sampling.gen_samples(train_trees, opt.label_size, embedding_lookup, batch_size)):
             print("-------------")
             nodes, children, batch_labels = batch
-
 
            
             _, err = sess.run(
@@ -144,9 +141,7 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
                 correct_labels = []
                 predictions = []
                 logits = []
-                for batch in sampling.batch_samples(
-                    sampling.gen_samples(val_trees, labels, embedding_lookup), batch_size
-                ):
+                for batch in sampling.gen_samples(val_trees, opt.label_size, embedding_lookup, batch_size):
                     print("-----------")
                     nodes, children, batch_labels = batch
 
@@ -162,10 +157,10 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
                     batch_predictions = np.argmax(output[0], axis=1).tolist()
                     correct_labels.extend(batch_correct_labels)
                     predictions.extend(batch_predictions)
-                    print(batch_correct_labels)
-                    print(batch_predictions)
+                    print("Ground truth : " + str(batch_correct_labels))
+                    print("Predictions : " + str(batch_predictions))
 
-                target_names = list(labels)
+                target_names = list(opt.labels)
                 acc = accuracy_score(correct_labels, predictions)
                 cur_acc = acc
                 acc = 0.5
@@ -179,7 +174,7 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
     print("Finish all iters, storring the whole model..........")
 
 
-def test_model(test_trees, labels, embedding_lookup, opt):
+def test_model(test_trees, embedding_lookup, opt):
     
    
     epochs = opt.niter
@@ -206,9 +201,7 @@ def test_model(test_trees, labels, embedding_lookup, opt):
     correct_labels = []
     predictions = []
     print('Computing training accuracy...')
-    for batch in sampling.batch_samples(
-        sampling.gen_samples(test_trees, labels, embedding_lookup), batch_size
-    ):
+    for batch in sampling.gen_samples(test_trees, opt.label_size, embedding_lookup, batch_size):
         nodes, children, batch_labels = batch
         output = sess.run([treecaps.softmax],
             feed_dict={
@@ -227,7 +220,7 @@ def test_model(test_trees, labels, embedding_lookup, opt):
         print(batch_predictions)
       
 
-    target_names = list(labels)
+    target_names = list(opt.labels)
     print(classification_report(correct_labels, predictions, target_names=target_names))
     print(confusion_matrix(correct_labels, predictions))
     print('*'*50)
@@ -235,6 +228,9 @@ def test_model(test_trees, labels, embedding_lookup, opt):
     print('*'*50)
 
 
+# def test(trees):
+#     for tree in trees:
+#         print(tree["label"])
 def main(opt):
     
     print("Loading embeddings....")
@@ -245,25 +241,27 @@ def main(opt):
     model_directory = form_model_path(opt)
     opt.model_path = os.path.join(opt.model_path, model_directory)
 
-    labels = [str(i) for i in range(1, opt.n_classes+1)]
+    labels = [str(i) for i in range(0, opt.n_classes)]
     opt.label_size = len(labels)
+    opt.labels = labels
 
     if opt.training:
         print("Loading train trees...")
         train_data_loader = MonoLanguageProgramData(opt.train_directory, 0, opt.n_classes)
-        train_trees, _ = train_data_loader.trees, train_data_loader.labels
+        train_trees = train_data_loader.trees
 
+        # test(train_trees)
         val_data_loader = MonoLanguageProgramData(opt.test_directory, 2, opt.n_classes)
-        val_trees, _ = val_data_loader.trees, val_data_loader.labels
+        val_trees = val_data_loader.trees
 
-        train_model(train_trees, val_trees,  labels, node_type_lookup , opt) 
+        train_model(train_trees, val_trees, node_type_lookup , opt) 
 
     if opt.testing:
         print("Loading test trees...")
         test_data_loader = MonoLanguageProgramData(opt.test_directory, 1, opt.n_classes)
-        test_trees, _ = test_data_loader.trees, test_data_loader.labels
+        test_trees = test_data_loader.trees
         print("All testing trees : " + str(len(test_trees)))
-        test_model(test_trees, labels, node_type_lookup , opt) 
+        test_model(test_trees, node_type_lookup , opt) 
 
 if __name__ == "__main__":
     if not os.path.exists(opt.model_path):
