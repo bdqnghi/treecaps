@@ -19,7 +19,7 @@ import config
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_batch_size', type=int, default=5, help='train batch size, always 1')
 parser.add_argument('--test_batch_size', type=int, default=1, help='test batch size, always 1')
-parser.add_argument('--niter', type=int, default=configs.EPOCHS, help='number of epochs to train for')
+parser.add_argument('--niter', type=int, default=config.EPOCHS, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--verbal', type=bool, default=True, help='print training info or not')
 parser.add_argument('--n_classes', type=int, default=config.N_CLASSES, help='manual seed')
