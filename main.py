@@ -55,6 +55,7 @@ def form_model_path(opt):
     model_traits = {}
     model_traits["output_size"] = config.OUTPUT_SIZE
     model_traits["num_conv"] = config.NUM_CONV
+    model_traits["n_class"] = config.N_CLASSES
     model_traits["code_caps_num_caps"] = config.CODE_CAPS_NUM_CAPS
     model_traits["code_caps_o_dimension"] = config.CODE_CAPS_OUTPUT_DIMENSION
     model_traits["class_caps_o_dimension"] = config.CLASS_CAPS_OUTPUT_DIMENSION
@@ -216,8 +217,8 @@ def test_model(test_trees, embedding_lookup, opt):
         batch_predictions = np.argmax(output[0], axis=1).tolist()
         correct_labels.extend(batch_correct_labels)
         predictions.extend(batch_predictions)
-        print(batch_correct_labels)
-        print(batch_predictions)
+        print("Ground truth : " + str(batch_correct_labels))
+        print("Predictions : " + str(batch_predictions))
       
 
     target_names = list(opt.labels)

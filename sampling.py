@@ -27,6 +27,7 @@ def gen_samples(trees, label_size, vector_lookup, batch_size):
             # print("Num samples : " + str(samples))
             batch_nodes, batch_children, batch_labels = [], [], []
             for element in elements:
+                print(element["label"])
                 nodes, children, labels = extract_training_data(element, label_size)
                 batch_nodes.append(nodes)
                 batch_children.append(children)
