@@ -12,7 +12,6 @@ from data_loader import MonoLanguageProgramData
 import argparse
 import random
 import shutil
-import progressbar
 from keras_radam.training import RAdamOptimizer
 from network import TreeCapsModel
 import config
