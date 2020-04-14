@@ -164,8 +164,7 @@ def train_model(train_trees, val_trees, embedding_lookup, opt):
                 target_names = list(opt.labels)
                 acc = accuracy_score(correct_labels, predictions)
                 cur_acc = acc
-                acc = 0.5
-                cur_acc = acc
+                
                 if (acc>max_acc):
                     max_acc = acc
                     saver.save(sess, checkfile)
