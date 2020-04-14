@@ -36,7 +36,7 @@ parser.add_argument('--testing', action="store_true",help='is testing')
 parser.add_argument('--training_percentage', type=float, default=1.0 ,help='percentage of data use for training')
 parser.add_argument('--log_path', default="" ,help='log path for tensorboard')
 parser.add_argument('--epoch', type=int, default=0, help='epoch to test')
-parser.add_argument('--embeddings_directory', default="embedding/fast_pretrained_vectors.pkl")
+parser.add_argument('--embeddings_directory', default="embedding/node_type_lookup.pkl")
 parser.add_argument('--cuda', default="0",type=str, help='enables cuda')
 
 opt = parser.parse_args()
@@ -46,22 +46,21 @@ os.environ['CUDA_VISIBLE_DEVICES'] = opt.cuda
 if not os.path.isdir("cached"):
     os.mkdir("cached")
 
-batch_size = BATCH_SIZE
-def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, opt):
+batch_size = config.BATCH_SIZE
+feature_size = config.FEATURE_SIZE
+def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
     max_acc = 0.0
     logdir = opt.model_path
     # batch_size = opt.train_batch_size
     epochs = opt.niter
-    num_feats = len(embeddings[0])
     
     random.shuffle(train_trees)
     
-    nodes_node, children_node, codecaps_node, alpha_IJ_node = network.init_net_treecaps(num_feats,len(labels), embedding_lookup)
+    nodes_node, children_node, codecaps_node, loss_node, labels_node = network.init_net_treecaps(feature_size,len(labels), embedding_lookup)
 
     codecaps_node = tf.identity(codecaps_node, name="codecaps_node")
 
     out_node = network.out_layer(codecaps_node)
-    labels_node, loss_node = network.loss_layer(codecaps_node, len(labels))
 
     optimizer = RAdamOptimizer(opt.lr)
     train_step = optimizer.minimize(loss_node)
@@ -84,12 +83,6 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
 
     checkfile = os.path.join(logdir, 'tree_network.ckpt')
 
-    top_a = config.TOP_A
-   
-    num_conv = config.NUM_CONV
-    output_size = config.OUTPUT_SIZE
-    num_channel = config.NUM_CHANNEL
-    num_caps_top_a = int(num_conv*output_size/num_channel)*top_a
 
     print("Begin training..........")
     num_batches = len(train_trees) // batch_size + (1 if len(train_trees) % batch_size != 0 else 0)
@@ -97,7 +90,7 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
         # bar = progressbar.ProgressBar(maxval=len(train_trees), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         # bar.start()
         for i, batch in enumerate(sampling.batch_samples(
-            sampling.gen_samples(train_trees, labels, embeddings, embedding_lookup), batch_size
+            sampling.gen_samples(train_trees, labels, embedding_lookup), batch_size
         )):
             print("-------------")
             nodes, children, batch_labels = batch
@@ -106,18 +99,13 @@ def train_model(train_trees, val_trees, labels, embeddings, embedding_lookup, op
             step = (epoch - 1) * num_batches + i * batch_size
 
 
-            alpha_IJ_shape = (int(num_caps_top_a/top_a*nodes.shape[1]), num_caps_top_a)
-            alpha_IJ = np.zeros(alpha_IJ_shape)
-            # if not nodes:
-            #     continue
+          
             _, err, out = sess.run(
                 [train_step, loss_node, out_node],
                 feed_dict={
                     nodes_node: nodes,
                     children_node: children,
-                    labels_node: batch_labels,
-                    alpha_IJ_node: alpha_IJ
-            
+                    labels_node: batch_labels         
                 }
             )
             # codecaps_node_data = sess.run(
@@ -232,8 +220,8 @@ def main(opt):
     
     print("Loading embeddings....")
     with open(opt.embeddings_directory, 'rb') as fh:
-        embeddings, embed_lookup = pickle.load(fh,encoding='latin1')
-       
+        embed_lookup = pickle.load(fh,encoding='latin1')
+        
     labels = [str(i) for i in range(1, opt.n_classes+1)]
 
     if opt.training:
@@ -244,14 +232,14 @@ def main(opt):
         val_data_loader = MonoLanguageProgramData(opt.test_directory, 2, opt.n_classes)
         val_trees, _ = val_data_loader.trees, val_data_loader.labels
 
-        train_model(train_trees, val_trees,  labels, embeddings, embed_lookup , opt) 
+        train_model(train_trees, val_trees,  labels, embed_lookup , opt) 
 
     if opt.testing:
         print("Loading test trees...")
         test_data_loader = MonoLanguageProgramData(opt.test_directory, 1, opt.n_classes)
         test_trees, _ = test_data_loader.trees, test_data_loader.labels
         print("All testing trees : " + str(len(test_trees)))
-        test_model(test_trees, labels, embeddings, embed_lookup , opt) 
+        test_model(test_trees, labels, embed_lookup , opt) 
 
 if __name__ == "__main__":
     if not os.path.exists(opt.model_path):

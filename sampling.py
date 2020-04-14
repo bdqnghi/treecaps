@@ -5,7 +5,7 @@ from tqdm import *
 
 from keras.preprocessing.sequence import pad_sequences
 
-def gen_samples(trees, labels, vectors, vector_lookup):
+def gen_samples(trees, labels, vector_lookup):
     """Creates a generator that returns a tree in BFS order with each node
     replaced by its vector embedding, and a child lookup table."""
 
