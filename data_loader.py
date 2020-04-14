@@ -8,7 +8,6 @@ from tqdm import trange
 from tqdm import *
 import random
 import pickle
-import msgpack
 import csv
 
 class MonoLanguageProgramData():
@@ -72,7 +71,7 @@ def build_tree(script):
     with open(script, 'rb') as file_handler:
         data_source = pickle.load(file_handler)
     return data_source
-    
+
 def _traverse_tree(root):
     num_nodes = 1
     queue = [root]
