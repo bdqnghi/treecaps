@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 import random
 from tqdm import *
-
+import config
 from keras.preprocessing.sequence import pad_sequences
 
 def gen_samples(trees, labels, vector_lookup):
@@ -39,7 +39,7 @@ def gen_samples(trees, labels, vector_lookup):
             nodes.append(int(n))
 
         
-            if len(nodes) < 2000:
+            if len(nodes) < config.FILE_SIZE_THRESHOLD:
                 yield (nodes, children, label)
         
             # yield (nodes, children, label)
