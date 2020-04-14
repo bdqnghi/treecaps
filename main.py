@@ -23,7 +23,7 @@ parser.add_argument('--test_batch_size', type=int, default=1, help='test batch s
 parser.add_argument('--niter', type=int, default=120, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--verbal', type=bool, default=True, help='print training info or not')
-parser.add_argument('--n_classes', type=int, default=2, help='manual seed')
+parser.add_argument('--n_classes', type=int, default=config.N_CLASSES, help='manual seed')
 parser.add_argument('--train_directory', default=config.TRAIN_DIRECTORY, help='train program data') 
 parser.add_argument('--test_directory', default=config.TEST_DIRECTORY, help='test program data')
 parser.add_argument('--val_directory', default=config.VAL_DIRECTORY, help='val program data')
