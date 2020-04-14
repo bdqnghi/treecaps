@@ -19,27 +19,28 @@ def gen_samples(trees, labels, vector_lookup):
     
         nodes = []
         children = []
-        label = label_lookup[tree['label']]
-
+        label = label_lookup[tree["label"]]
+        size = tree["size"]
         queue = [(tree['tree'], -1)]
-        while queue:
-            node, parent_ind = queue.pop(0)
-            node_ind = len(nodes)
-            # add children and the parent index to the queue
-            queue.extend([(child, node_ind) for child in node['children']])
-            # create a list to store this node's children indices
-            children.append([])
-            # add this child to its parent's child list
-            if parent_ind > -1:
-                children[parent_ind].append(node_ind)
-            
-            n = str(node['node'])
-            # look_up_vector = vector_lookup[n]
-            # nodes.append(vectors[int(n)])
-            nodes.append(int(n))
 
-        
-            if len(nodes) < config.FILE_SIZE_THRESHOLD:
+        if size < config.FILE_SIZE_THRESHOLD:
+            while queue:
+                node, parent_ind = queue.pop(0)
+                node_ind = len(nodes)
+                # add children and the parent index to the queue
+                queue.extend([(child, node_ind) for child in node['children']])
+                # create a list to store this node's children indices
+                children.append([])
+                # add this child to its parent's child list
+                if parent_ind > -1:
+                    children[parent_ind].append(node_ind)
+                
+                n = str(node['node'])
+                # look_up_vector = vector_lookup[n]
+                # nodes.append(vectors[int(n)])
+                nodes.append(int(n))
+
+             
                 yield (nodes, children, label)
         
             # yield (nodes, children, label)

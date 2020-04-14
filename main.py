@@ -151,7 +151,7 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
                     nodes, children, batch_labels = batch
 
 
-                    output = sess.run([out_node],
+                    output = sess.run([treecaps.softmax],
                         feed_dict={
                             treecaps.placeholders["node_types"]: nodes,
                             treecaps.placeholders["children_indices"]: children,

@@ -59,7 +59,7 @@ def load_program_data(directory, n_classes):
                 tree, size, _, _ = _traverse_tree(root)
 
             result.append({
-                'tree': tree, 'label': label
+                'tree': tree, 'label': label, "size": size
             })
             labels.append(label)
 
@@ -73,7 +73,7 @@ def build_tree(script):
     return data_source
 
 def _traverse_tree(root):
-    num_nodes = 1
+    num_nodes = 0
     queue = [root]
 
     root_json = {
