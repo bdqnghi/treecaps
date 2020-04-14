@@ -38,11 +38,11 @@ def gen_samples(trees, labels, vector_lookup):
             # nodes.append(vectors[int(n)])
             nodes.append(int(n))
 
-        if len(nodes) > 5000 :
-            if len(children) < 700:
+        
+            if len(nodes) < 2000:
                 yield (nodes, children, label)
-        else:
-            yield (nodes, children, label)
+        
+            # yield (nodes, children, label)
 
 
 def batch_samples(gen, batch_size):
