@@ -5,10 +5,8 @@ from utils import softmax
 from utils import get_shape
 import numpy as np
 import config
-from config import BATCH_SIZE
 
 stddev = 0.01
-batch_size = BATCH_SIZE
 iter_routing = 3
 regular_sc = 1e-7
 epsilon = 1e-11
@@ -27,6 +25,7 @@ class TreeCapsModel():
         self.node_type_lookup = opt.node_type_lookup
         self.label_size = opt.label_size
         self.node_type_dim = opt.node_type_dim
+        self.batch_size = opt.batch_size
 
         self.node_dim = self.node_type_dim
 

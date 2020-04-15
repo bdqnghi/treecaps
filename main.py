@@ -19,6 +19,7 @@ import config
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_batch_size', type=int, default=5, help='train batch size, always 1')
 parser.add_argument('--test_batch_size', type=int, default=1, help='test batch size, always 1')
+parser.add_argument('--batch_size', type=int, default=config.BATCH_SIZE, help='test batch size, always 1')
 parser.add_argument('--niter', type=int, default=config.EPOCHS, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--verbal', type=bool, default=True, help='print training info or not')
@@ -50,7 +51,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = opt.cuda
 if not os.path.isdir("cached"):
     os.mkdir("cached")
 
-batch_size = config.BATCH_SIZE
+batch_size = opt.batch_size
 
 
 def form_model_path(opt):
