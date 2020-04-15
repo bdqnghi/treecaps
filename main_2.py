@@ -13,7 +13,7 @@ import argparse
 import random
 import shutil
 from keras_radam.training import RAdamOptimizer
-from network import TreeCapsModel
+from network_2 import TreeCapsModel
 import config
 
 parser = argparse.ArgumentParser()
@@ -69,7 +69,7 @@ def form_model_path(opt):
         model_path.append(k + "_" + str(v))
     
     # mnp = method_name_prediction to handle too long file name
-    return "tree_caps_pc" + "_" + "-".join(model_path)
+    return "tree_caps_pc2" + "_" + "-".join(model_path)
 
 
 
