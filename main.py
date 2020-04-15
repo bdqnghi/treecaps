@@ -324,19 +324,19 @@ def analysis(test_trees, embedding_lookup, opt):
                 f.write(line)
                 f.write("\n")
 
-        # for label, class_capsule in enumerate(class_caps_score):
-            
-        #     line = str(label) + ","
-        #     # capsule = capsule.tolist()
-        #     capsule_score = []
-        #     for score in class_capsule:
-        #         capsule_score.append(str(score))
+        for label, class_capsule in enumerate(class_caps_score):
 
-        #     capsule_score = " ".join(capsule_score)
-        #     with open(class_caps_analysis_path, "a") as f:
-        #         line = line + capsule_score
-        #         f.write(line)
-        #         f.write("\n")
+            line = str(label) + ","
+            # capsule = capsule.tolist()
+            capsule_score = []
+            for score in class_capsule:
+                capsule_score.append(str(score))
+
+            capsule_score = " ".join(capsule_score)
+            with open(class_caps_analysis_path, "a") as f:
+                line = line + capsule_score
+                f.write(line)
+                f.write("\n")
 
 # def test(trees , name):
 #     all_tuples = []
@@ -379,6 +379,13 @@ def main(opt):
         val_trees = val_data_loader.trees
 
         train_model(train_trees, val_trees, node_type_lookup , opt) 
+
+    if opt.testing:
+        print("Loading test trees...")
+        test_data_loader = MonoLanguageProgramData(opt.test_directory, 1, opt.n_classes)
+        test_trees = test_data_loader.trees
+        print("All testing trees : " + str(len(test_trees)))
+        test_model(test_trees, node_type_lookup , opt) 
 
     if opt.analyzing:
         print("Loading test trees...")
