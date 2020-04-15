@@ -311,32 +311,32 @@ def analysis(test_trees, embedding_lookup, opt):
         print(code_caps_score.shape)
 
         
-        for channel, code_capsule in enumerate(code_caps_score):
-            line = str(correct_label) + "," + str(channel) + ","
+        # for channel, code_capsule in enumerate(code_caps_score):
+        #     line = str(correct_label) + "," + str(channel) + ","
+        #     # capsule = capsule.tolist()
+        #     capsule_score = []
+        #     for score in code_capsule:
+        #         capsule_score.append(str(score))
+
+        #     capsule_score = " ".join(capsule_score)
+        #     with open(code_caps_analysis_path, "a") as f:
+        #         line = line + capsule_score
+        #         f.write(line)
+        #         f.write("\n")
+
+        for label, class_capsule in enumerate(class_caps_score):
+            
+            line = str(label) + ","
             # capsule = capsule.tolist()
             capsule_score = []
-            for score in code_capsule:
+            for score in class_capsule:
                 capsule_score.append(str(score))
 
             capsule_score = " ".join(capsule_score)
-            with open(code_caps_analysis_path, "a") as f:
+            with open(class_caps_analysis_path, "a") as f:
                 line = line + capsule_score
                 f.write(line)
                 f.write("\n")
-
-        for label, class_capsule in enumerate(class_caps_score):
-            if label < 20:
-                line = str(label) + ","
-                # capsule = capsule.tolist()
-                capsule_score = []
-                for score in class_capsule:
-                    capsule_score.append(str(score))
-
-                capsule_score = " ".join(capsule_score)
-                with open(class_caps_analysis_path, "a") as f:
-                    line = line + capsule_score
-                    f.write(line)
-                    f.write("\n")
 
 # def test(trees , name):
 #     all_tuples = []
