@@ -311,18 +311,18 @@ def analysis(test_trees, embedding_lookup, opt):
         print(code_caps_score.shape)
 
         
-        # for channel, code_capsule in enumerate(code_caps_score):
-        #     line = str(correct_label) + "," + str(channel) + ","
-        #     # capsule = capsule.tolist()
-        #     capsule_score = []
-        #     for score in code_capsule:
-        #         capsule_score.append(str(score))
+        for channel, code_capsule in enumerate(code_caps_score):
+            line = str(correct_label) + "," + str(channel) + ","
+            # capsule = capsule.tolist()
+            capsule_score = []
+            for score in code_capsule:
+                capsule_score.append(str(score))
 
-        #     capsule_score = " ".join(capsule_score)
-        #     with open(code_caps_analysis_path, "a") as f:
-        #         line = line + capsule_score
-        #         f.write(line)
-        #         f.write("\n")
+            capsule_score = " ".join(capsule_score)
+            with open(code_caps_analysis_path, "a") as f:
+                line = line + capsule_score
+                f.write(line)
+                f.write("\n")
 
         for label, class_capsule in enumerate(class_caps_score):
             
