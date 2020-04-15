@@ -324,19 +324,19 @@ def analysis(test_trees, embedding_lookup, opt):
                 f.write(line)
                 f.write("\n")
 
-        for label, class_capsule in enumerate(class_caps_score):
+        # for label, class_capsule in enumerate(class_caps_score):
             
-            line = str(label) + ","
-            # capsule = capsule.tolist()
-            capsule_score = []
-            for score in class_capsule:
-                capsule_score.append(str(score))
+        #     line = str(label) + ","
+        #     # capsule = capsule.tolist()
+        #     capsule_score = []
+        #     for score in class_capsule:
+        #         capsule_score.append(str(score))
 
-            capsule_score = " ".join(capsule_score)
-            with open(class_caps_analysis_path, "a") as f:
-                line = line + capsule_score
-                f.write(line)
-                f.write("\n")
+        #     capsule_score = " ".join(capsule_score)
+        #     with open(class_caps_analysis_path, "a") as f:
+        #         line = line + capsule_score
+        #         f.write(line)
+        #         f.write("\n")
 
 # def test(trees , name):
 #     all_tuples = []
