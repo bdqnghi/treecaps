@@ -27,8 +27,10 @@ parser.add_argument('--train_directory', default=config.TRAIN_DIRECTORY, help='t
 parser.add_argument('--test_directory', default=config.TEST_DIRECTORY, help='test program data')
 parser.add_argument('--val_directory', default=config.VAL_DIRECTORY, help='val program data')
 parser.add_argument('--model_path', default="model", help='path to save the model')
+parser.add_argument('--analysis_path', default="analysis", help='path to save the analysis files')
 parser.add_argument('--training', action="store_true",help='is training')
 parser.add_argument('--testing', action="store_true",help='is testing')
+parser.add_argument('--analyzing', action="store_true",help='is analying')
 parser.add_argument('--training_percentage', type=float, default=1.0 ,help='percentage of data use for training')
 parser.add_argument('--log_path', default="" ,help='log path for tensorboard')
 parser.add_argument('--embeddings_directory', default="embedding/node_type_lookup.pkl")
@@ -245,9 +247,86 @@ def test_model(test_trees, embedding_lookup, opt):
     print('*'*50)
 
 
-# def test(trees):
+def analysis(test_trees, embedding_lookup, opt):
+    
+   
+    epochs = opt.niter
+
+    random.shuffle(test_trees)
+
+    # build the inputs and outputs of the network
+    treecaps = TreeCapsModel(opt)   
+ 
+ 
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+    with tf.name_scope('saver'):
+        saver = tf.train.Saver()
+        ckpt = tf.train.get_checkpoint_state(opt.model_path)
+        if ckpt and ckpt.model_checkpoint_path:
+            print("Continue training with old model")
+            saver.restore(sess, ckpt.model_checkpoint_path)
+            for i, var in enumerate(saver._var_list):
+                print('Var {}: {}'.format(i, var))
+                
+    checkfile = os.path.join(opt.model_path, 'tree_network.ckpt')
+
+    try:
+        os.makedirs(opt.analysis_path, exist_ok=True)
+    except Exception as e:
+        print(e)
+
+    analysis_path = os.path.join(opt.analysis_path, "code_caps.txt")
+
+    correct_labels = []
+    predictions = []
+    print('Computing training accuracy...')
+    with open(analysis_path, "a") as f:
+        for batch in sampling.gen_samples(test_trees, opt.label_size, embedding_lookup, batch_size):
+            nodes, children, batch_labels = batch
+            output = sess.run([treecaps.code_caps],
+                feed_dict={
+                    treecaps.placeholders["node_types"]: nodes,
+                    treecaps.placeholders["children_indices"]: children,
+                    treecaps.placeholders["labels"]: batch_labels  
+                }
+            )
+
+            code_caps_score = output[0]
+            # print(output[0].shape)
+            
+            batch_correct_labels = np.argmax(batch_labels, axis=1).tolist()
+            correct_label = batch_correct_labels[0]
+            code_caps_score = np.squeeze(code_caps_score, axis=0)
+            code_caps_score = np.squeeze(code_caps_score, axis=2)
+            print(code_caps_score.shape)
+
+        
+            for capsule in code_caps_score:
+                line = str(correct_label) + ","
+                # capsule = capsule.tolist()
+                capsule_score = []
+                for score in capsule:
+                    capsule_score.append(str(score))
+
+                capsule_score = " ".join(capsule_score)
+                
+                line = line + capsule_score
+                f.write(line)
+                f.write("\n")
+
+# def test(trees , name):
+#     all_tuples = []
 #     for tree in trees:
-#         print(tree["label"])
+#         tup = (tree["size"],tree["label"])
+#         all_tuples.append(tup)
+#     all_tuples = sorted(all_tuples, key=lambda tup: tup[0])
+#     with open("tree_size_" + name + ".txt", "w") as f:
+#         for t in all_tuples:
+#             line = str(t[0]) + "," + str(t[1])
+#             # print(tree["size"])
+#             f.write(line)
+#             f.write("\n")
 def main(opt):
     
     print("Loading embeddings....")
@@ -256,7 +335,9 @@ def main(opt):
     opt.node_type_lookup = node_type_lookup
 
     model_directory = form_model_path(opt)
+    opt.model_directory = model_directory
     opt.model_path = os.path.join(opt.model_path, model_directory)
+    opt.analysis_path = os.path.join(opt.analysis_path, model_directory)
 
     labels = [str(i) for i in range(0, opt.n_classes)]
     opt.label_size = len(labels)
@@ -270,18 +351,18 @@ def main(opt):
         train_data_loader = MonoLanguageProgramData(opt.train_directory, 0, opt.n_classes)
         train_trees = train_data_loader.trees
 
-        # test(train_trees)
+        # test(train_trees, "train")
         val_data_loader = MonoLanguageProgramData(opt.test_directory, 2, opt.n_classes)
         val_trees = val_data_loader.trees
 
         train_model(train_trees, val_trees, node_type_lookup , opt) 
 
-    if opt.testing:
+    if opt.analyzing:
         print("Loading test trees...")
         test_data_loader = MonoLanguageProgramData(opt.test_directory, 1, opt.n_classes)
         test_trees = test_data_loader.trees
         print("All testing trees : " + str(len(test_trees)))
-        test_model(test_trees, node_type_lookup , opt) 
+        analysis(test_trees, node_type_lookup , opt) 
 
 if __name__ == "__main__":
     if not os.path.exists(opt.model_path):
