@@ -125,7 +125,7 @@ class TreeCapsModel():
             w_dynamic_routing = tf.tile(w_dynamic_routing, [1, tf.shape(primary_variable_caps)[1], 1, 1, 1])
 
             # (batch_size, output_size x max_node, 1, num_conv, 1)
-            primary_variable_caps_reshaped = tf.reshape(primary_variable_caps, shape=[batch_size, -1, 1, input_dimension, 1])
+            primary_variable_caps_reshaped = tf.reshape(primary_variable_caps, shape=[self.batch_size, -1, 1, input_dimension, 1])
             
             # (batch_size, output_size x max_node, output_dimension * output_size, num_conv, 1)
             primary_variable_caps_tiled = tf.tile(primary_variable_caps_reshaped, [1, 1, output_dimension * output_size, 1, 1])
@@ -140,7 +140,7 @@ class TreeCapsModel():
             u_hat_stopped = tf.stop_gradient(u_hat, name='stop_gradient')
             
             # # (3, output_size x max_node, output_size, 1, 1)
-            delta_IJ = tf.zeros([batch_size, tf.shape(primary_variable_caps_reshaped)[1], output_size, 1, 1], dtype=tf.dtypes.float32)
+            delta_IJ = tf.zeros([self.batch_size, tf.shape(primary_variable_caps_reshaped)[1], output_size, 1, 1], dtype=tf.dtypes.float32)
             for r_iter in range(iter_routing):
                 with tf.variable_scope('iter_' + str(r_iter)):
                     gamma_IJ = tf.nn.softmax(delta_IJ, axis=2)
@@ -188,7 +188,7 @@ class TreeCapsModel():
 
        
         # (batch_size, output_size x max_node, 1, num_conv, 1)
-        primary_variable_caps_reshaped = tf.reshape(primary_variable_caps, shape=[batch_size, -1, 1, input_dimension, 1])
+        primary_variable_caps_reshaped = tf.reshape(primary_variable_caps, shape=[self.batch_size, -1, 1, input_dimension, 1])
         
         # (batch_size, output_size x max_node, output_dimension * output_size, num_conv, 1)
         # (3, 80*48, 16*80, 2, 1)
@@ -206,7 +206,7 @@ class TreeCapsModel():
 
         # (3, output_size x max_node, 80, 1, 1)
 
-        delta_IJ = tf.zeros([batch_size, tf.shape(primary_variable_caps_reshaped)[1], output_size, 1, 1], dtype=tf.dtypes.float32)
+        delta_IJ = tf.zeros([self.batch_size, tf.shape(primary_variable_caps_reshaped)[1], output_size, 1, 1], dtype=tf.dtypes.float32)
         for r_iter in range(iter_routing):
             with tf.variable_scope('iter_' + str(r_iter)):
                 gamma_IJ = tf.nn.softmax(delta_IJ, axis=2)
