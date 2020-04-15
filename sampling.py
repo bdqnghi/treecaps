@@ -27,7 +27,7 @@ def gen_samples(trees, label_size, vector_lookup, batch_size):
             # print("Num samples : " + str(samples))
             batch_nodes, batch_children, batch_labels = [], [], []
             for element in elements:
-                print(element["label"])
+                # print(element["label"])
                 nodes, children, labels = extract_training_data(element, label_size)
                 batch_nodes.append(nodes)
                 batch_children.append(children)
@@ -82,7 +82,6 @@ def batch_samples(gen, batch_size):
         if samples >= batch_size:
             # nodes_indicator = _produce_mask_vector(nodes)
             nodes, children, labels = _pad_batch(nodes, children, labels)
-            print(labels)
             yield nodes, children, labels
             nodes, children, labels = [], [], []
             samples = 0

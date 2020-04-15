@@ -101,11 +101,21 @@ def train_model(train_trees, val_trees, embedding_lookup, opt):
 
     checkfile = os.path.join(opt.model_path, 'tree_network.ckpt')
 
+    max_acc = 0.0
+    model_accuracy_path = os.path.join(opt.model_path, "accuracy.txt")
+    if not os.path.exists(model_accuracy_path):
+        with open(model_accuracy_path, "w") as f:
+            f.write("0.0")
+    else:
+        with open(model_accuracy_path, "w") as f1:
+            data = f1.readlines()
+            for line in data:
+                max_acc = float(line.replace("\n",""))
+
 
     print("Begin training..........")
-    max_acc = 0.0
+    
     cur_acc = 0.0
-    num_batches = len(train_trees) // batch_size + (1 if len(train_trees) % batch_size != 0 else 0)
     for epoch in range(1, epochs+1):
         # bar = progressbar.ProgressBar(maxval=len(train_trees), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         # bar.start()
@@ -168,6 +178,9 @@ def train_model(train_trees, val_trees, embedding_lookup, opt):
                 if (acc>max_acc):
                     max_acc = acc
                     saver.save(sess, checkfile)
+
+                    with open(model_accuracy_path,"w") as f2:
+                        f2.write(str(max_acc))
 
                 print('Epoch',str(epoch),'Accuracy:', acc, 'Max Acc: ',max_acc)
 
