@@ -104,6 +104,10 @@ def train_model(train_trees, val_trees, embedding_lookup, opt):
     max_acc = 0.0
     model_accuracy_path = os.path.join(opt.model_path, "accuracy.txt")
     if not os.path.exists(model_accuracy_path):
+        try:
+            os.mkdir(opt.model_path)
+        except Exception as e:
+            print(e) 
         with open(model_accuracy_path, "w") as f:
             f.write("0.0")
     else:
