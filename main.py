@@ -277,41 +277,62 @@ def analysis(test_trees, embedding_lookup, opt):
     except Exception as e:
         print(e)
 
-    analysis_path = os.path.join(opt.analysis_path, "code_caps.txt")
+    code_caps_analysis_path = os.path.join(opt.analysis_path, "code_caps.txt")
+    class_caps_analysis_path = os.path.join(opt.analysis_path, "class_caps.txt")
 
     correct_labels = []
     predictions = []
     print('Computing training accuracy...')
-    with open(analysis_path, "a") as f:
-        for batch in sampling.gen_samples(test_trees, opt.label_size, embedding_lookup, batch_size):
-            nodes, children, batch_labels = batch
-            output = sess.run([treecaps.code_caps],
-                feed_dict={
-                    treecaps.placeholders["node_types"]: nodes,
-                    treecaps.placeholders["children_indices"]: children,
-                    treecaps.placeholders["labels"]: batch_labels  
-                }
-            )
+    
+    for batch in sampling.gen_samples(test_trees, opt.label_size, embedding_lookup, batch_size):
+        nodes, children, batch_labels = batch
+        output = sess.run([treecaps.code_caps, treecaps.class_caps],
+            feed_dict={
+                treecaps.placeholders["node_types"]: nodes,
+                treecaps.placeholders["children_indices"]: children,
+                treecaps.placeholders["labels"]: batch_labels  
+            }
+        )
 
-            code_caps_score = output[0]
-            # print(output[0].shape)
-            
-            batch_correct_labels = np.argmax(batch_labels, axis=1).tolist()
-            correct_label = batch_correct_labels[0]
-            code_caps_score = np.squeeze(code_caps_score, axis=0)
-            code_caps_score = np.squeeze(code_caps_score, axis=2)
-            print(code_caps_score.shape)
+        code_caps_score = output[0]
+        class_caps_score = output[1]
+        # print(output[0].shape)
+        
+        batch_correct_labels = np.argmax(batch_labels, axis=1).tolist()
+        correct_label = batch_correct_labels[0]
+        code_caps_score = np.squeeze(code_caps_score, axis=0)
+        code_caps_score = np.squeeze(code_caps_score, axis=2)
+
+
+        class_caps_score = np.squeeze(class_caps_score, axis=0)
+        class_caps_score = np.squeeze(class_caps_score, axis=2)
+
+
+        print(code_caps_score.shape)
 
         
-            for capsule in code_caps_score:
-                line = str(correct_label) + ","
-                # capsule = capsule.tolist()
-                capsule_score = []
-                for score in capsule:
-                    capsule_score.append(str(score))
+        for channel, code_capsule in enumerate(code_caps_score):
+            line = str(correct_label) + "," + str(channel) + ","
+            # capsule = capsule.tolist()
+            capsule_score = []
+            for score in code_capsule:
+                capsule_score.append(str(score))
 
-                capsule_score = " ".join(capsule_score)
-                
+            capsule_score = " ".join(capsule_score)
+            with open(code_caps_analysis_path, "a") as f:
+                line = line + capsule_score
+                f.write(line)
+                f.write("\n")
+
+        for label, class_capsule in enumerate(class_caps_score):
+            line = str(label) + ","
+            # capsule = capsule.tolist()
+            capsule_score = []
+            for score in class_capsule:
+                capsule_score.append(str(score))
+
+            capsule_score = " ".join(capsule_score)
+            with open(class_caps_analysis_path, "a") as f:
                 line = line + capsule_score
                 f.write(line)
                 f.write("\n")
