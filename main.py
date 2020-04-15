@@ -107,7 +107,7 @@ def train_model(train_trees, val_trees, embedding_lookup, opt):
         with open(model_accuracy_path, "w") as f:
             f.write("0.0")
     else:
-        with open(model_accuracy_path, "w") as f1:
+        with open(model_accuracy_path, "r") as f1:
             data = f1.readlines()
             for line in data:
                 max_acc = float(line.replace("\n",""))
@@ -257,6 +257,9 @@ def main(opt):
     labels = [str(i) for i in range(0, opt.n_classes)]
     opt.label_size = len(labels)
     opt.labels = labels
+
+    if os.path.exists(opt.model_path):
+        print("Continue using old model : " + str(opt.model_path))
 
     if opt.training:
         print("Loading train trees...")
