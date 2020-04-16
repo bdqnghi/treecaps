@@ -230,6 +230,7 @@ def test_model(test_trees, embedding_lookup, opt):
     print('Computing training accuracy...')
     for batch in sampling.gen_samples(test_trees, opt.label_size, embedding_lookup, batch_size):
         nodes, children, batch_labels = batch
+        print("----------------------------------")
         output = sess.run([treecaps.softmax],
             feed_dict={
                 treecaps.placeholders["node_types"]: nodes,
@@ -245,6 +246,7 @@ def test_model(test_trees, embedding_lookup, opt):
         predictions.extend(batch_predictions)
         print("Ground truth : " + str(batch_correct_labels))
         print("Predictions : " + str(batch_predictions))
+        print('Accuracy:', accuracy_score(correct_labels, predictions))
       
 
     target_names = list(opt.labels)
@@ -253,7 +255,6 @@ def test_model(test_trees, embedding_lookup, opt):
     print('*'*50)
     print('Accuracy:', accuracy_score(correct_labels, predictions))
     print('*'*50)
-
 
 def analysis(test_trees, embedding_lookup, opt):
     
