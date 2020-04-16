@@ -301,8 +301,8 @@ class TreeCapsModel():
             # ] 
             nodes = []
             for layer in range(num_conv):
-                new_parent_embeddings = self.conv_node(parent_node_embeddings, children_embeddings, children_indices, node_dim, layer)
-                children_embeddings = self.compute_children_node_types_tensor(new_parent_embeddings, children_indices, node_dim)
+                parent_node_embeddings = self.conv_node(parent_node_embeddings, children_embeddings, children_indices, node_dim, layer)
+                children_embeddings = self.compute_children_node_types_tensor(parent_node_embeddings, children_indices, node_dim)
                 nodes.append(tf.expand_dims(new_parent_embeddings, axis=-1))
             return nodes 
 
