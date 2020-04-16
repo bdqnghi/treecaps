@@ -9,7 +9,7 @@ def gen_samples(trees, label_size, vector_lookup, batch_size):
     """Creates a generator that returns a tree in BFS order with each node
     replaced by its vector embedding, and a child lookup table."""
 
-    rando.shuffle(trees)
+    random.shuffle(trees)
     # encode labels as one-hot vectors
 
     # trees_test = []
