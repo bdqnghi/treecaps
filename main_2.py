@@ -15,6 +15,7 @@ import shutil
 from keras_radam.training import RAdamOptimizer
 from network_2 import TreeCapsModel
 import config
+random.seed(42)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_batch_size', type=int, default=5, help='train batch size, always 1')
@@ -386,6 +387,8 @@ def main(opt):
         # test(train_trees, "train")
         val_data_loader = MonoLanguageProgramData(opt.test_directory, 2, opt.n_classes)
         val_trees = val_data_loader.trees
+
+        val_trees = random.sample(val_trees, int(len(val_trees)/8))
 
         train_model(train_trees, val_trees, node_type_lookup , opt) 
 
