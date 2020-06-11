@@ -13,7 +13,7 @@
 
 ### Datasets
 
-We used t datasets in three programming languages to ensure cross-language robustness:
+We used 2 datasets in 2 programming languages to ensure cross-language robustness:
 
 * [**SA Dataset:**]: 10 classes of sorting algorithms, with 64 training programs on average per class, written in Java. 
 * [**OJ Dataset:**]: 104 classes of C programs, with 375 training programs on average per class. 
