@@ -3,7 +3,6 @@ import logging
 import pickle
 import tensorflow as tf
 import numpy as np
-import network as network
 import sampling as sampling
 import sys
 import random
@@ -13,7 +12,7 @@ import argparse
 import random
 import shutil
 from keras_radam.training import RAdamOptimizer
-from network_4 import TreeCapsModel
+from network_vts import TreeCapsModel
 import config
 random.seed(42)
 
