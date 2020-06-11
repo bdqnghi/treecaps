@@ -6,7 +6,7 @@
 
 1. Install the required dependencies ```pip install -r requirements.txt```.
 
-2. Download and extract the dataset ```python3 download_data.py```
+2. Download and extract the dataset ```python3 download_data.py```. After this step, you can see two folders OJ_data and SA_data
 
 3. 
 - Run ```python3 main_vts.py``` for VTS routing
