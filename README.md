@@ -1,6 +1,6 @@
-# TreeCaps: Tree-Structured Capsule Networks for Program Source Code Processing.
+# TreeCaps: Tree-based Capsule Networks for Source Code Processing.
 
-<p aligh="center"> This repository contains the code for TreeCaps introduced in the following paper <b>TreeCaps: Tree-Structured Capsule Networks for Program Source Code Processing (NeurIPS Workshops 2019) </b> </p>
+<p aligh="center"> This repository contains the code for TreeCaps introduced in the following paper <b>TreeCaps: Tree-based Capsule Networks for Source Code Processing. (NeurIPS 2020) </b> </p>
 
 ## Usage
 
@@ -8,7 +8,7 @@
 
 2. Download and extract the dataset ```python3 download_data.py```. After this step, you can see two folders OJ_data and SA_data, noted that this data has been parsed into Srcml-based AST as protobuf format.
 
-3. 
+3. To train the model:
 - Run ```python3 main_vts.py``` for VTS routing
 - Run ```python3 main_drsw.py``` for DRSW routing
 
