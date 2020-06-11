@@ -6,9 +6,9 @@
 
 1. Install the required dependencies ```pip install -r requirements.txt```.
 
-2. Download and extract the [dataset](https://drive.google.com/open?id=1qdLNPjlNfGSLm9SdbQE6Me8K7Cp4W_ee)
+2. Download and extract the dataset ```python3 download_data.py```
 
-3. Simply run ```python main_vts.py```.
+3. Simply run ```python3 main_vts.py```.
 
 
 ### Datasets
