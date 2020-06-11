@@ -8,7 +8,10 @@
 
 2. Download and extract the dataset ```python3 download_data.py```
 
-3. Simply run ```python3 main_vts.py```.
+3. 
+- Run ```python3 main_vts.py``` for VTS routing
+- Run ```python3 main_drsw.py``` for DRSW routing
+
 
 
 ### Datasets
