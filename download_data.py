@@ -19,6 +19,7 @@ def download_url(url, output_path):
 code_classification_data_url = "https://treecaps.s3-ap-southeast-1.amazonaws.com/code_classification_data.zip"
 output_path = "code_classification_data.zip"
 
+download_url(code_classification_data_url, output_path)
 
 with zipfile.ZipFile(output_path) as zf:
     for member in tqdm(zf.infolist(), desc='Extracting '):
