@@ -1,4 +1,4 @@
-# TreeCaps: Tree-based Capsule Networks for Source Code Processing.
+# TreeCaps: Tree-based Capsule Networks for Source Code Processing [Not Actively Maintained]
 
 <p aligh="center"> This repository contains the code for TreeCaps introduced in the following paper <b>TreeCaps: Tree-based Capsule Networks for Source Code Processing. (NeurIPS 2020) </b> </p>
 
