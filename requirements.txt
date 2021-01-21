@@ -9,7 +9,7 @@
 keras
 
 ## Tensorflow neural-network library ##
-tensorflow==1.14
+tensorflow==1.15.4
 
 ## MSGPack ##
 msgpack
