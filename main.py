@@ -34,7 +34,7 @@ parser.add_argument('--testing', action="store_true",help='is testing')
 parser.add_argument('--training_percentage', type=float, default=1.0 ,help='percentage of data use for training')
 parser.add_argument('--log_path', default="" ,help='log path for tensorboard')
 parser.add_argument('--epoch', type=int, default=0, help='epoch to test')
-parser.add_argument('--embeddings_directory', default="embedding/fast_pretrained_vectors.pkl")
+parser.add_argument('--node_type_lookup_path', default="node_type/node_type_lookup.pkl")
 parser.add_argument('--cuda', default="0",type=str, help='enables cuda')
 
 opt = parser.parse_args()
@@ -201,9 +201,9 @@ def train_model(train_trees, val_trees, labels, embedding_lookup, opt):
 
 def main(opt):
     
-    print("Loading embeddings....")
-    with open(opt.embeddings_directory, 'rb') as fh:
-        embeddings, embed_lookup = pickle.load(fh,encoding='latin1')
+    print("Loading node type....")
+    with open(opt.node_type_lookup_path, 'rb') as fh:
+        node_type_lookup = pickle.load(fh,encoding='latin1')
        
     labels = [str(i) for i in range(1, opt.n_classes+1)]
 
@@ -215,7 +215,7 @@ def main(opt):
         val_data_loader = MonoLanguageProgramData(opt.test_directory, 2, opt.n_classes)
         val_trees, _ = val_data_loader.trees, val_data_loader.labels
 
-        train_model(train_trees, val_trees, labels, embed_lookup , opt) 
+        train_model(train_trees, val_trees, labels, node_type_lookup , opt) 
 
     # if opt.testing:
     #     print("Loading test trees...")

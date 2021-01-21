@@ -16,8 +16,8 @@ def download_url(url, output_path):
         urllib.request.urlretrieve(url, filename=output_path, reporthook=t.update_to)\
 
 
-code_classification_data_url = "https://treecaps.s3-ap-southeast-1.amazonaws.com/code_classification_data.zip"
-output_path = "code_classification_data.zip"
+code_classification_data_url = "https://ai4code.s3-ap-southeast-1.amazonaws.com/OJ_data.zip"
+output_path = "OJ_data.zip"
 
 download_url(code_classification_data_url, output_path)
 
