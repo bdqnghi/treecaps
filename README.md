@@ -6,11 +6,10 @@
 
 1. Install the required dependencies ```pip install -r requirements.txt```.
 
-2. Download and extract the dataset ```python3 download_data.py```. After this step, you can see two folders OJ_data and SA_data, noted that this data has been parsed into Srcml-based AST as protobuf format.
+2. Download and extract the dataset ```python3 download_data.py```. After this step, you can see two folders OJ_data and SA_data, noted that this data has been parsed into SRCML-based AST (https://www.srcml.org/) as protobuf format.
 
 3. To train the model:
-- Run ```python3 main_vts.py``` for VTS routing
-- Run ```python3 main_drsw.py``` for DRSW routing
+- Run ```python3 mains.py --training```
 
 
 
