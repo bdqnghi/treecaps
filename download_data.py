@@ -27,4 +27,3 @@ with zipfile.ZipFile(output_path) as zf:
             zf.extract(member, ".")
         except zipfile.error as e:
             pass
-

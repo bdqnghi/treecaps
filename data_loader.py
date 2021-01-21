@@ -24,11 +24,11 @@ class MonoLanguageProgramData():
         print(saved_input_filename)
         if os.path.exists(saved_input_filename):
             with open(saved_input_filename, 'rb') as file_handler:
-                trees = pickle.load(file_handler)
+                trees, labels = pickle.load(file_handler)
 
         else:
-            trees = load_program_data(path,n_classes)
-            data = trees
+            trees, labels = load_program_data(path,n_classes)
+            data = (trees, labels)
             with open(saved_input_filename, 'wb') as file_handler:
                 pickle.dump(data, file_handler, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -36,41 +36,8 @@ class MonoLanguageProgramData():
         print("Number of all data : " + str(len(trees)))
       
         self.trees = trees
+        self.labels = labels
 
-
-def load_program_data(directory, n_classes):
-
-    result = []
-    all_paths = []
-    for i in trange(1, n_classes + 1):
-        dir_path = os.path.join(directory, str(i))    
-        for file in listdir(dir_path):
-            file_path = os.path.join(dir_path, file)
-            all_paths.append(file_path)
-
-    random.shuffle(all_paths)
-    # print(all_paths)
-
-    for path in all_paths:
-            # print(file_path)
-        splits = path.split("/")
-      
-        label = int(splits[len(splits)-2])
-        
-        ast_representation = build_tree(path)
-
-        if ast_representation.HasField("element"):
-            root = ast_representation.element
-            tree, size, _, _ = _traverse_tree(root)
-      
-        obj = {
-            "tree": tree, 
-            "label": label, 
-            "size": size
-        }
-        result.append(obj)
-    # random.shuffle(result)
-    return result
 
 def build_tree(script):
     """Builds an AST from a script."""
@@ -79,8 +46,35 @@ def build_tree(script):
         data_source = pickle.load(file_handler)
     return data_source
 
+
+def load_program_data(directory, n_classes):
+
+    result = []
+    labels = []
+    for i in trange(1, n_classes + 1):
+        dir_path = os.path.join(directory, str(i))
+        for file in listdir(dir_path):
+            file_path = os.path.join(dir_path, file)
+            # print(file_path)
+            splits = file_path.split("/")
+          
+            label = splits[len(splits)-2]
+            # print(label)
+            ast_representation = build_tree(file_path)
+
+            if ast_representation.HasField("element"):
+                root = ast_representation.element
+                tree, size, _, _ = _traverse_tree(root)
+
+            result.append({
+                'tree': tree, 'label': label
+            })
+            labels.append(label)
+
+    return result, list(set(labels))
+
 def _traverse_tree(root):
-    num_nodes = 0
+    num_nodes = 1
     queue = [root]
 
     root_json = {
@@ -114,8 +108,5 @@ def _traverse_tree(root):
 
             current_node_json['children'].append(child_json)
             queue_json.append(child_json)
-   
+              
     return root_json, num_nodes, node_ids, node_types
-
-
-
