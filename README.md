@@ -20,3 +20,14 @@ We used 2 datasets in 2 programming languages to ensure cross-language robustnes
 * [**SA Dataset:**]: 10 classes of sorting algorithms, with 64 training programs on average per class, written in Java. 
 * [**OJ Dataset:**]: 104 classes of C programs, with 375 training programs on average per class. 
 
+## Citation
+If you find this tutorial useful for your research, please consider citing our paper:
+
+```bibtex
+@article{bui2020treecaps,
+  title={TreeCaps: Tree-Based Capsule Networks for Source Code Processing},
+  author={Bui, Nghi DQ and Yu, Yijun and Jiang, Lingxiao},
+  journal={arXiv preprint arXiv:2009.09777},
+  year={2020}
+}
+```
